@@ -28,9 +28,9 @@ def start_chat():
 
     match url.path:
         case "/pirate":
-            sys_inst = "Talk like a pirate"
+            sys_inst = "Talk like a pirate."
         case "/translate":
-            sys_inst = "You will be performing translation tasks. Do not repeat the prompt, output the translation only"
+            sys_inst = None
         case _:
             sys_inst = None
 
@@ -88,79 +88,35 @@ def send_message():
 def get_lang():
     global chat
 
-    try:
-        chat
-    except:
-        start_chat()
+    start_chat()
 
     text = request.json["text"]
     target_lang = request.json["target_lang"]
 
     response = chat.send_message(
-        f"""Analyze the following piece of text surrounded by triple backticks 
-            and output the most likely language of this piece of text:
-            ```Good morning```
-            English
-
-            Analyze the following piece of text surrounded by triple backticks 
-            and output the most likely language of this piece of text:
-            ```发生了什么事？```
-            Chinese
-
-            Analyze the following piece of text surrounded by triple backticks 
-            and output the most likely language of this piece of text:
-            ```Je veux un croissant```
-            French
-
-            Analyze the following piece of text surrounded by triple backticks 
-            and output the most likely language of this piece of text:
-            ```よろしくお願いします```
-            Japanese
-
-            Analyze the following piece of text surrounded by triple backticks 
-            and output the most likely language of this piece of text:
+        f"""What is the language of the following piece of text, output the language name only:
             ```{text}```
         """,
         generation_config=genai.types.GenerationConfig(
-            candidate_count=1,
+            candidate_count=1, temperature=0
         ),
     )
 
-    source_lang = response.text
+    source_lang = response.text.strip()
 
     response = chat.send_message(
-        f"""Translate the following piece of text surrounded by triple backticks 
-            from English to Japanese:
-            ```Good morning```
-            おはようございます
-
-            Translate the following piece of text surrounded by triple backticks 
-            from Chinese to English:
-            ```发生了什么事？```
-            What happened?
-
-            Translate the following piece of text surrounded by triple backticks 
-            from French to English:
-            ```Je veux un croissant```
-            I want a croissant
-
-            Translate the following piece of text surrounded by triple backticks 
-            from Japanese to Traditional Chinese:
-            ```よろしくお願いします```
-            請多多指教
-
-            Translate the following piece of text surrounded by triple backticks 
-            from {source_lang} to {target_lang}:
+        f"""
+            Translate the following piece of text from {source_lang} to {target_lang}, output the translated text only without quotation marks, do not change formatting:
             ```{text}```
         """,
         generation_config=genai.types.GenerationConfig(
-            candidate_count=1,
+            candidate_count=1, temperature=0
         ),
     )
 
-    translation = response.text
+    translation = response.text.strip()
 
-    return {"source_lang": source_lang, "translation": translation}
+    return {"source_lang": source_lang, "translation": translation}, 200
 
 
 app.run()
