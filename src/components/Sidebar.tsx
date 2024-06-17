@@ -10,7 +10,7 @@ function SidebarItem({ item }: { item: ISidebarItem }) {
   const [bgColor, setBgColor] = useState("");
   useEffect(() => {
     if (window.location.pathname == item.href) {
-      setBgColor("rgba(255, 255, 255, 0.05)");
+      setBgColor("rgba(0, 0, 0, 0.2)");
     }
   }, [item.href]);
   return (
@@ -19,7 +19,7 @@ function SidebarItem({ item }: { item: ISidebarItem }) {
         p="10px"
         bgColor={bgColor}
         rounded="md"
-        _hover={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+        _hover={{ backgroundColor: "rgba(0, 0, 0, 0.3)" }}
       >
         {item.name}
       </Box>
